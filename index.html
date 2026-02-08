@@ -1,777 +1,1293 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Математика для детей</title>
-
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>European Roulette - TG Mini App</title>
   <style>
     :root{
-      --ink:#101828;
-      --muted:#667085;
-      --glass: rgba(255,255,255,.78);
-      --stroke: rgba(16,24,40,.10);
-      --shadow: 0 18px 60px rgba(16,24,40,.16);
-      --r: 24px;
+      --bg:#071b0b;
+      --panel:rgba(0,0,0,.35);
+      --table:#0b2f10;
+      --gold:#d4af37;
+      --txt:#ffffff;
+      --mut:rgba(255,255,255,.72);
+      --red:#d91520;
+      --black:#0b0b0b;
+      --green:#0b7a2a;
+      --chipEdge:rgba(0,0,0,.35);
+      --btn:#0a1019;
+      --btnB:#ffd166;
     }
-
-    *{ box-sizing:border-box; }
-
+    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; touch-action:manipulation;}
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--ink);
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: clamp(10px, 2.5vw, 16px);
-      background:
-        radial-gradient(circle at 12% 18%, rgba(255,90,165,.55), transparent 50%),
-        radial-gradient(circle at 86% 20%, rgba(86,207,255,.60), transparent 52%),
-        radial-gradient(circle at 70% 92%, rgba(160,255,138,.55), transparent 50%),
-        radial-gradient(circle at 22% 88%, rgba(255,220,90,.65), transparent 48%),
-        linear-gradient(135deg, #f7f8ff, #fff7fb 40%, #f6fffb);
+      background:var(--bg);
+      color:var(--txt);
+      height:100dvh;
+      overflow:hidden;
     }
-
-    .wrap{ width:min(980px, 100%); display:grid; gap:12px; }
-
-    .topbar{
-      display:flex; gap:10px; flex-wrap:wrap;
-      align-items:center; justify-content:space-between;
+    #app{height:100dvh; display:flex; flex-direction:column;}
+    #header{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:12px 14px;
+      background:var(--panel);
+      border-bottom:1px solid rgba(212,175,55,.55);
     }
-
-    .pill{
-      background:var(--glass);
-      border:1px solid var(--stroke);
-      border-radius:999px;
-      padding:10px 14px;
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-      box-shadow: var(--shadow);
-      font-size:14px;
-      backdrop-filter: blur(10px);
-    }
-
-    .toggle{
-      display:flex; align-items:center; gap:6px;
-      font-weight:800; color:var(--muted); user-select:none;
-      white-space:nowrap;
-    }
-
-    input[type="checkbox"]{ width:18px; height:18px; accent-color:#ff4db5; }
-
-    select{
-      border-radius:14px;
-      padding:8px 10px;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.92);
+    .balance{font-weight:900; font-size:18px;}
+    .sub{font-size:12px; color:var(--mut);}
+    .hdrR{display:flex; gap:10px; align-items:center;}
+    .iconBtn{
+      width:38px;height:38px;border-radius:999px;
+      display:grid;place-items:center;
+      border:1px solid rgba(212,175,55,.6);
+      background:rgba(212,175,55,.12);
+      color:var(--gold);
       font-weight:900;
-      color:var(--ink);
+      cursor:pointer;
+      user-select:none;
     }
 
-    .card{
-      background:var(--glass);
-      border:1px solid var(--stroke);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      padding: clamp(12px, 2.3vw, 18px);
-      backdrop-filter: blur(12px);
-    }
-
-    .stage{
+    #main{flex:1; display:flex; flex-direction:column; padding:10px; gap:10px; overflow:hidden;}
+    #topRow{
       display:grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap:12px;
+      grid-template-columns: 1fr;
+      gap:10px;
       align-items:start;
     }
-    @media (max-width: 900px){
-      .stage{ grid-template-columns: 1fr; }
-    }
 
-    .problemBox{
-      height: clamp(220px, 42vw, 320px);
-      border-radius: var(--r);
-      border:1px solid rgba(255,255,255,.6);
-      background:
-        radial-gradient(circle at 18% 22%, rgba(255,255,255,.95), rgba(255,255,255,.5)),
-        linear-gradient(135deg, rgba(255,90,165,.30), rgba(86,207,255,.22), rgba(160,255,138,.22));
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    /* Wheel area */
+    #wheelWrap{
       position:relative;
+      border-radius:18px;
+      border:1px solid rgba(212,175,55,.35);
+      background:rgba(0,0,0,.18);
+      padding:10px;
       overflow:hidden;
     }
-
-    .problem{
-      font-size: clamp(44px, 8vw, 86px);
-      font-weight: 950;
-      letter-spacing: 1px;
-      text-shadow: 0 12px 40px rgba(16,24,40,.18);
-      user-select:none;
-      padding: 0 14px;
-      text-align:center;
-      line-height:1.05;
-      word-break: break-word;
+    #wheelArea{
+      width:min(420px, 100%);
+      aspect-ratio:1/1;
+      margin:0 auto;
+      position:relative;
     }
-
-    .buddy{
-      position:absolute;
-      right:12px; bottom:12px;
-      display:flex; align-items:center; gap:10px;
+    canvas{width:100%; height:100%; display:block; border-radius:999px;}
+    #banner{
+      position:absolute; inset:auto 10px 10px 10px;
       padding:10px 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.82);
-      border:1px solid rgba(0,0,0,.06);
-      box-shadow: 0 14px 28px rgba(0,0,0,.10);
-      backdrop-filter: blur(10px);
-      user-select:none;
-      max-width: 74%;
+      border-radius:12px;
+      border:1px solid rgba(212,175,55,.35);
+      background:rgba(0,0,0,.55);
+      color:var(--gold);
+      font-weight:900;
+      letter-spacing:.4px;
+      text-align:center;
+      opacity:0;
+      transform: translateY(6px);
+      transition: opacity .2s ease, transform .2s ease;
+      pointer-events:none;
     }
-    .buddy .face{ font-size:24px; }
-    .buddy .text{
-      font-size:13px;
-      color:var(--muted);
-      font-weight:800;
+    #banner.show{opacity:1; transform:translateY(0);}
+    #timerBar{
+      position:absolute; inset:10px 10px auto 10px;
+      height:8px;
+      border-radius:999px;
       overflow:hidden;
-      text-overflow: ellipsis;
-      white-space:nowrap;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.25);
+    }
+    #timerFill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, rgba(255,209,102,.95), rgba(212,175,55,.95));
+      transition:width .05s linear;
     }
 
-    .hint{
-      margin-top:10px;
-      color:var(--muted);
+    /* Table */
+    #tableWrap{
+      flex:1;
+      border-radius:16px;
+      border:1px solid rgba(212,175,55,.35);
+      background:rgba(0,0,0,.12);
+      padding:10px;
+      overflow:hidden;
       display:flex;
-      justify-content:space-between;
-      flex-wrap:wrap;
+      flex-direction:column;
       gap:10px;
-      font-weight:700;
-      font-size:13px;
+      min-height: 0;
     }
 
-    .controls{ display:grid; gap:12px; align-content:start; }
-
-    .msg{
-      background: rgba(255,255,255,.86);
-      border-radius:18px;
-      padding:12px 14px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border:1px solid var(--stroke);
-      min-height:56px;
-      box-shadow: 0 12px 24px rgba(0,0,0,.08);
+    #table{
+      flex:1;
+      overflow:auto;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:var(--table);
+      padding:8px;
     }
 
-    .row{
+    /* classic roulette layout: 0 + 12 rows x 3 columns + outside bets */
+    .layout{
       display:grid;
-      grid-template-columns: 1fr auto;
-      gap:10px;
-      align-items:center;
+      grid-template-columns: 0.85fr repeat(3, 1fr) 0.85fr;
+      gap:4px;
+      min-width: 560px; /* чтобы в портрете скроллилось нормально */
+      align-items:stretch;
     }
-    @media (max-width: 520px){
-      .row{ grid-template-columns: 1fr; }
-    }
-
-    .answer{
-      width:100%;
-      font-size:20px;
+    .cell{
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      display:flex; align-items:center; justify-content:center;
       font-weight:900;
-      padding:12px 14px;
-      border-radius:18px;
-      border:1px solid rgba(16,24,40,.14);
-      background: rgba(255,255,255,.92);
-      outline:none;
-    }
-    .answer:focus{
-      border-color: rgba(255,77,181,.55);
-      box-shadow: 0 0 0 4px rgba(255,77,181,.15);
-    }
-
-    .btns{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    button{
-      border:0;
-      border-radius:18px;
-      padding:12px 14px;
-      font-weight:900;
+      user-select:none;
       cursor:pointer;
+      position:relative;
+      min-height:44px;
+    }
+    .n{font-size:14px;}
+    .zero{grid-row:1 / span 12; grid-column:1; background:var(--green);}
+    .red{background:var(--red);}
+    .black{background:var(--black);}
+    .colBtn{
+      grid-column:5;
+      background:rgba(0,0,0,.35);
+      color:var(--gold);
+      font-size:12px;
+    }
+    .outside{
+      margin-top:8px;
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap:4px;
+      min-width:560px;
+    }
+    .outside .cell{min-height:42px; font-size:12px; color:var(--gold); background:rgba(0,0,0,.30);}
+    .outside .cell.rb{color:#fff;}
+    .outside .cell.rb.red{background:var(--red);}
+    .outside .cell.rb.black{background:var(--black);}
+
+    /* Bet markers */
+    .chipMark{
+      position:absolute;
+      right:6px; top:6px;
+      min-width:22px;
+      padding:2px 6px;
+      border-radius:999px;
+      font-size:11px;
+      background:rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.14);
       color:#fff;
-      background: linear-gradient(135deg, #ff4db5, #5ac8ff, #43f089);
-      box-shadow: 0 14px 30px rgba(16,24,40,.16);
-      transition: transform .08s ease;
-      white-space:nowrap;
-    }
-    button:active{ transform: translateY(1px) scale(.99); }
-
-    button.secondary{
-      background: rgba(255,255,255,.90);
-      color:var(--ink);
-      border:1px solid var(--stroke);
-      box-shadow: 0 12px 24px rgba(16,24,40,.12);
+      font-variant-numeric: tabular-nums;
     }
 
-    .chips{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      padding:14px;
-      border-radius:18px;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.74);
+    /* Bottom controls */
+    #bottom{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    #chips{
+      display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
     }
     .chip{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      background: rgba(17,24,39,.06);
-      border:1px solid rgba(17,24,39,.08);
+      width:48px; height:48px; border-radius:999px;
+      display:grid; place-items:center;
+      font-weight:1000;
+      color:#101010;
+      cursor:pointer;
+      border:2px solid rgba(255,255,255,.18);
+      box-shadow: 0 10px 18px rgba(0,0,0,.28);
+      user-select:none;
+      transform: translateZ(0);
+    }
+    .chip.active{ outline:2px solid rgba(255,209,102,.9); outline-offset:2px; }
+    .c1{background:#ffd166;}
+    .c5{background:#ff6b6b;}
+    .c10{background:#4ecdc4;}
+    .c25{background:#45b7d1;}
+    .c100{background:#96ceb4;}
+
+    #buttons{
+      display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+    }
+    .btn{
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.25);
+      color:var(--gold);
       font-weight:900;
       cursor:pointer;
-      user-select:none;
     }
-    .chip input{ width:18px; height:18px; }
-    .small{ color:var(--muted); font-weight:800; font-size:13px; }
+    .btn.primary{
+      background:linear-gradient(180deg, var(--btnB), #a56a1f);
+      color:#1a1206;
+      border:0;
+      box-shadow: 0 14px 26px rgba(0,0,0,.35);
+    }
+    .btn:disabled{opacity:.55; cursor:not-allowed;}
 
-    .errorBox{
-      display:none;
-      padding:12px 14px;
-      border-radius:18px;
-      border:1px solid rgba(239,68,68,.25);
-      background: rgba(239,68,68,.10);
-      color:#7f1d1d;
-      font-weight:800;
-      white-space:pre-wrap;
+    #stats{
+      display:flex; gap:10px; justify-content:space-between; align-items:flex-start;
+      font-size:12px; color:var(--mut);
+      padding:8px 2px 0;
     }
-
-    /* ===== Оверлей “Открыть в Safari” =====
-       Без JS он останется, но ссылка будет кликабельна.
-       С JS он прячется через 0.4 секунды.
-    */
-    .openSafari{
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-      background: rgba(255,255,255,.88);
-      backdrop-filter: blur(12px);
-    }
-    .openSafariCard{
-      width: min(560px, 100%);
-      border-radius: 22px;
-      border: 1px solid var(--stroke);
-      background: rgba(255,255,255,.92);
-      box-shadow: var(--shadow);
-      padding: 16px;
-    }
-    .openSafariTitle{
-      font-weight: 950;
-      font-size: 18px;
-      margin: 0 0 8px;
-    }
-    .openSafariText{
-      margin: 0 0 12px;
-      color: var(--muted);
-      font-weight: 750;
-      line-height: 1.35;
-      font-size: 14px;
-    }
-    .openSafariActions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .openSafariLink{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:12px 14px;
-      border-radius:18px;
-      font-weight:900;
-      text-decoration:none;
+    .hist{display:flex; gap:6px; flex-wrap:wrap;}
+    .ball{
+      width:22px;height:22px;border-radius:999px;
+      display:grid; place-items:center;
+      font-size:11px; font-weight:900;
+      border:1px solid rgba(255,255,255,.16);
       color:#fff;
-      background: linear-gradient(135deg, #ff4db5, #5ac8ff, #43f089);
-      box-shadow: 0 14px 30px rgba(16,24,40,.16);
-      white-space:nowrap;
+    }
+    .panel{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.22);
     }
 
-    .hintSteps{
-      margin-top: 10px;
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 13px;
-      line-height: 1.35;
+    /* Big win overlay */
+    #overlay{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.82);
+      display:none;
+      align-items:center; justify-content:center;
+      z-index:999;
+      padding:18px;
+    }
+    #overlay.show{display:flex;}
+    #card{
+      width:min(520px, 100%);
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:#0a1019;
+      padding:18px;
+      text-align:center;
+      box-shadow: 0 30px 120px rgba(0,0,0,.6);
+    }
+    #bigTitle{
+      font-size:34px;
+      font-weight:1000;
+      letter-spacing:.4px;
+      margin:0 0 8px;
+      background:linear-gradient(45deg,#ffd700,#ff8c00);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    #bigAmt{
+      font-size:22px; font-weight:900; color:#fff;
+      margin:0 0 16px;
+      font-variant-numeric: tabular-nums;
     }
 
-    .tiny{
-      margin-top: 8px;
-      color: rgba(102,112,133,.95);
-      font-weight: 750;
-      font-size: 12px;
-      line-height: 1.35;
+    #footer{
+      text-align:center;
+      font-size:12px;
+      color:rgba(255,255,255,.55);
+      padding:8px 10px;
+      border-top:1px solid rgba(212,175,55,.25);
+      background:rgba(0,0,0,.18);
+    }
+
+    @media (min-width: 920px){
+      #topRow{grid-template-columns: 420px 1fr;}
+      #wheelWrap{height:100%;}
+      #tableWrap{height:100%;}
+      .layout, .outside{min-width: 0;}
     }
   </style>
 </head>
-
 <body>
-  <!-- ОВЕРЛЕЙ -->
-  <div id="openSafari" class="openSafari">
-    <div class="openSafariCard">
-      <p class="openSafariTitle">Открой в Safari</p>
-      <p class="openSafariText">
-        Встроенные просмотрщики часто не запускают кнопки и озвучку.
-        В Safari всё работает нормально.
-      </p>
-
-      <div class="openSafariActions">
-        <!-- ВАЖНО: вставь сюда свой https:// адрес этой же страницы -->
-        <a id="openSafariLink" class="openSafariLink" href="https://example.com/INDEX.html" target="_blank" rel="noopener">
-          Открыть в Safari
-        </a>
-
-        <button id="continueBtn" type="button" class="secondary">Продолжить тут</button>
-      </div>
-
-      <div class="hintSteps">
-        Если ссылка открылась “внутри приложения”, тогда: Поделиться → Открыть в Safari.
-      </div>
-      <div class="tiny">
-        Подсказка: если здесь так и останется “Загрузка…”, значит JS в просмотрщике отключён, и играть можно только через Safari/браузер.
-      </div>
-
-      <noscript>
-        <div class="tiny" style="margin-top:10px; color:#7f1d1d;">
-          Похоже, JavaScript отключён. В этом режиме игра работать не будет.
-        </div>
-      </noscript>
+<div id="app">
+  <div id="header">
+    <div>
+      <div class="balance">Баланс: <span id="balance">5000</span></div>
+      <div class="sub">Ставка: <b id="totalBet">0</b> • Фаза: <b id="phase">betting</b></div>
+    </div>
+    <div class="hdrR">
+      <div class="iconBtn" id="soundBtn" title="Звук">🔊</div>
+      <div class="iconBtn" id="resetBtn" title="Сброс">↺</div>
     </div>
   </div>
 
-  <div class="wrap">
-    <div id="errorBox" class="errorBox"></div>
-
-    <div class="topbar">
-      <div class="pill">
-        ⭐ Очки: <strong id="score">0</strong>
-        🎯 Попытки: <strong id="tries">0</strong>
-        🔥 Серия: <strong id="streak">0</strong>
+  <div id="main">
+    <div id="topRow">
+      <div id="wheelWrap" class="panel">
+        <div id="wheelArea">
+          <canvas id="wheel"></canvas>
+          <div id="timerBar"><div id="timerFill"></div></div>
+          <div id="banner">NO MORE BETS</div>
+        </div>
       </div>
 
-      <div class="pill" style="gap:14px;">
-        <label class="toggle">
-          <input id="voiceToggle" type="checkbox" checked />
-          🗣️ голос
-        </label>
+      <div id="tableWrap" class="panel">
+        <div id="table">
+          <div class="layout" id="layout"></div>
+          <div class="outside" id="outside"></div>
+        </div>
 
-        <label class="toggle">
-          <input id="easyToggle" type="checkbox" checked />
-          🧩 полегче
-        </label>
-
-        <label class="toggle">
-          язык
-          <select id="lang">
-            <option value="ru" selected>RU</option>
-            <option value="en">EN</option>
-          </select>
-        </label>
-      </div>
-    </div>
-
-    <div class="card stage">
-      <div>
-        <div class="problemBox">
-          <div class="problem" id="problemText">Загрузка…</div>
-          <div class="buddy">
-            <div class="face" id="buddyFace">🙂</div>
-            <div class="text" id="buddyText">Впиши ответ</div>
+        <div id="bottom">
+          <div id="chips">
+            <div class="chip c1 active" data-chip="1">1</div>
+            <div class="chip c5" data-chip="5">5</div>
+            <div class="chip c10" data-chip="10">10</div>
+            <div class="chip c25" data-chip="25">25</div>
+            <div class="chip c100" data-chip="100">100</div>
+          </div>
+          <div id="buttons">
+            <button class="btn" id="undoBtn">Undo</button>
+            <button class="btn" id="clearBtn">Clear</button>
+            <button class="btn" id="repeatBtn">Repeat</button>
+            <button class="btn" id="autoBtn">Auto 3</button>
+            <button class="btn primary" id="spinBtn" disabled>SPIN</button>
+          </div>
+          <div id="stats">
+            <div>
+              <div>Последние:</div>
+              <div class="hist" id="hist"></div>
+            </div>
+            <div>
+              <div>Hot / Cold (15):</div>
+              <div id="hc"></div>
+            </div>
           </div>
         </div>
-
-        <div class="hint">
-          <span>Enter проверить</span>
-          <span>→ новый пример, ↑ повторить</span>
-        </div>
-      </div>
-
-      <div class="controls">
-        <div class="msg" id="message">
-          <div>Реши пример и введи ответ</div>
-          <div style="font-size:22px;">🧠</div>
-        </div>
-
-        <div class="row">
-          <input id="answer" class="answer" inputmode="numeric" autocomplete="off" placeholder="Ответ" />
-          <button id="checkBtn" type="button">Проверить</button>
-        </div>
-
-        <div class="btns">
-          <button id="newBtn" type="button">✨ Новый пример</button>
-          <button class="secondary" id="repeatBtn" type="button">🔁 Повтори</button>
-          <button class="secondary" id="helpBtn" type="button">💡 Подсказка</button>
-        </div>
-
-        <div class="chips">
-          <label class="chip"><input type="checkbox" id="opAdd" checked> +</label>
-          <label class="chip"><input type="checkbox" id="opSub" checked> -</label>
-          <label class="chip"><input type="checkbox" id="opMul" checked> ×</label>
-          <label class="chip"><input type="checkbox" id="opDiv" checked> ÷</label>
-          <div class="small">Если снять все галочки, включим все обратно.</div>
-        </div>
-
-        <div class="small">На iOS озвучка включается после первого тапа по странице.</div>
       </div>
     </div>
   </div>
 
+  <div id="footer">Демо-игра. Только виртуальные монеты. Без депозитов и вывода.</div>
+</div>
+
+<div id="overlay">
+  <div id="card">
+    <div id="bigTitle">WIN</div>
+    <div id="bigAmt">+0</div>
+    <button class="btn primary" id="contBtn">Играть ещё</button>
+  </div>
+</div>
+
 <script>
-(function(){
-  const errorBox = document.getElementById("errorBox");
-  const openSafariOverlay = document.getElementById("openSafari");
-  const continueBtn = document.getElementById("continueBtn");
-
-  function showError(e){
-    console.error(e);
-    errorBox.style.display = "block";
-    errorBox.textContent = "Ошибка в скрипте:\n\n" + (e && e.stack ? e.stack : String(e));
+(() => {
+  // ---------- Telegram WebApp ----------
+  const TG = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+  if (TG) {
+    TG.ready();
+    TG.expand();
+    try{
+      const tp = TG.themeParams || {};
+      // аккуратная адаптация: если тема светлая — поднимем фон, но не делаем белый стол
+      if (TG.colorScheme === "light") {
+        document.documentElement.style.setProperty("--bg", "#e9f6ea");
+        document.documentElement.style.setProperty("--table", "#cfead2");
+        document.documentElement.style.setProperty("--txt", "#0b0b0b");
+        document.documentElement.style.setProperty("--mut", "rgba(0,0,0,.65)");
+      }
+      // если Telegram дал цвета — можно чуть подстроиться
+      if (tp.bg_color) document.documentElement.style.setProperty("--bg", tp.bg_color);
+      if (tp.text_color) document.documentElement.style.setProperty("--txt", tp.text_color);
+    } catch {}
   }
 
-  // Если JS работает, дадим возможность убрать оверлей
-  continueBtn.addEventListener("click", () => {
-    openSafariOverlay.style.display = "none";
-  });
+  function haptic(kind){
+    if (!TG || !TG.HapticFeedback) return;
+    const hf = TG.HapticFeedback;
+    if (kind === "light") hf.impactOccurred("light");
+    else if (kind === "medium") hf.impactOccurred("medium");
+    else if (kind === "heavy") hf.impactOccurred("heavy");
+    else if (kind === "success") hf.notificationOccurred("success");
+  }
 
-  window.addEventListener("DOMContentLoaded", () => {
-    try{ init(); }
-    catch(e){ showError(e); }
-  });
+  // ---------- RNG ----------
+  function randU32(){
+    if (window.crypto && crypto.getRandomValues){
+      const a = new Uint32Array(1);
+      crypto.getRandomValues(a);
+      return a[0] >>> 0;
+    }
+    return (Math.floor(Math.random()*0xFFFFFFFF) >>> 0);
+  }
+  function randFloat(){ return randU32() / 0xFFFFFFFF; }
 
-  function init(){
-    // JS работает -> прячем оверлей через небольшой таймер
-    setTimeout(() => { openSafariOverlay.style.display = "none"; }, 400);
-
-    // ---------------------------
-    // Состояние
-    // ---------------------------
-    let score = 0, tries = 0, streak = 0;
-    let lang = "ru";
-    let easyMode = true;
-    let current = null;
-
-    // ---------------------------
-    // Элементы
-    // ---------------------------
-    const scoreEl = document.getElementById("score");
-    const triesEl = document.getElementById("tries");
-    const streakEl = document.getElementById("streak");
-
-    const problemTextEl = document.getElementById("problemText");
-    const messageEl = document.getElementById("message");
-    const answerEl = document.getElementById("answer");
-
-    const buddyFaceEl = document.getElementById("buddyFace");
-    const buddyTextEl = document.getElementById("buddyText");
-
-    const voiceToggleEl = document.getElementById("voiceToggle");
-    const easyToggleEl = document.getElementById("easyToggle");
-    const langEl = document.getElementById("lang");
-
-    const opAddEl = document.getElementById("opAdd");
-    const opSubEl = document.getElementById("opSub");
-    const opMulEl = document.getElementById("opMul");
-    const opDivEl = document.getElementById("opDiv");
-
-    // ---------------------------
-    // iOS-friendly SpeechSynthesis
-    // ---------------------------
-    let voicesCache = [];
-    function loadVoices(){
+  // ---------- Audio (procedural) ----------
+  const Sound = (() => {
+    let ctx=null, master=null;
+    function ensure(){
+      if (ctx) return;
       try{
-        voicesCache = ("speechSynthesis" in window) ? speechSynthesis.getVoices() : [];
-      }catch(e){
-        voicesCache = [];
-      }
+        ctx = new (window.AudioContext||window.webkitAudioContext)();
+        master = ctx.createGain();
+        master.gain.value = 0.5;
+        master.connect(ctx.destination);
+      }catch{ ctx=null; }
     }
-    if ("speechSynthesis" in window){
-      loadVoices();
-      speechSynthesis.onvoiceschanged = loadVoices;
+    function unlock(){ ensure(); if (ctx && ctx.state==="suspended") ctx.resume(); }
+    function setOn(on){ ensure(); if (!ctx) return; master.gain.value = on ? 0.5 : 0.0; }
+    function blip(f=520, t=0.08, v=0.10){
+      if(!ctx) return;
+      const now = ctx.currentTime;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type="triangle"; o.frequency.setValueAtTime(f, now);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(v, now+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now+t);
+      o.connect(g); g.connect(master);
+      o.start(now); o.stop(now+t+0.01);
     }
-
-    function pickVoice(){
-      if(!voicesCache.length) return null;
-      const wanted = (lang === "ru") ? ["ru-ru","ru"] : ["en-us","en-gb","en"];
-      for(const w of wanted){
-        const v = voicesCache.find(v => (v.lang || "").toLowerCase().startsWith(w));
-        if(v) return v;
-      }
-      return voicesCache[0];
+    function whoosh(ms=900){
+      if(!ctx) return;
+      const now = ctx.currentTime;
+      const n = Math.floor(ctx.sampleRate*(ms/1000));
+      const b = ctx.createBuffer(1,n,ctx.sampleRate);
+      const d = b.getChannelData(0);
+      for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+      const src=ctx.createBufferSource(); src.buffer=b;
+      const f=ctx.createBiquadFilter();
+      f.type="bandpass";
+      f.frequency.setValueAtTime(260, now);
+      f.frequency.linearRampToValueAtTime(980, now+ms/1000);
+      const g=ctx.createGain();
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.12, now+0.06);
+      g.gain.exponentialRampToValueAtTime(0.0001, now+ms/1000);
+      src.connect(f); f.connect(g); g.connect(master);
+      src.start(now); src.stop(now+ms/1000);
     }
-
-    let speakTimer = null;
-    function speak(text){
-      if(!voiceToggleEl.checked) return;
-      if(!("speechSynthesis" in window)) return;
-
-      clearTimeout(speakTimer);
-      speakTimer = setTimeout(() => {
-        try{
-          speechSynthesis.cancel();
-          const u = new SpeechSynthesisUtterance(text);
-          u.lang = (lang === "ru") ? "ru-RU" : "en-US";
-          const v = pickVoice();
-          if(v) u.voice = v;
-          u.rate = 0.95;
-          u.pitch = 1.05;
-          u.volume = 1.0;
-          speechSynthesis.speak(u);
-        }catch(e){}
-      }, 80);
+    function win(){
+      if(!ctx) return;
+      const now=ctx.currentTime;
+      [784,988,1175,1568].forEach((f,i)=>setTimeout(()=>blip(f,0.18,0.12), i*90));
     }
+    return { unlock, setOn, blip, whoosh, win };
+  })();
 
-    let voicePrimed = false;
-    function primeVoiceOnce(){
-      if(voicePrimed) return;
-      voicePrimed = true;
-      speak(lang === "ru" ? "Поехали!" : "Let's go!");
-    }
-
-    function primeOnFirstGesture(){
-      primeVoiceOnce();
-      window.removeEventListener("touchstart", primeOnFirstGesture);
-      window.removeEventListener("pointerdown", primeOnFirstGesture);
-    }
-    window.addEventListener("touchstart", primeOnFirstGesture, { passive:true });
-    window.addEventListener("pointerdown", primeOnFirstGesture, { passive:true });
-
-    // ---------------------------
-    // Утилиты
-    // ---------------------------
-    function randInt(min, max){
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function setBuddy(face, text){
-      buddyFaceEl.textContent = face;
-      buddyTextEl.textContent = text;
-    }
-
-    function setMessage(text, emoji){
-      messageEl.innerHTML = `<div>${text}</div><div style="font-size:22px;">${emoji}</div>`;
-    }
-
-    function updateStats(){
-      scoreEl.textContent = score;
-      triesEl.textContent = tries;
-      streakEl.textContent = streak;
-    }
-
-    function getEnabledOps(){
-      const ops = [];
-      if(opAddEl.checked) ops.push("+");
-      if(opSubEl.checked) ops.push("-");
-      if(opMulEl.checked) ops.push("×");
-      if(opDivEl.checked) ops.push("÷");
-      if(ops.length === 0){
-        opAddEl.checked = opSubEl.checked = opMulEl.checked = opDivEl.checked = true;
-        return ["+","-","×","÷"];
-      }
-      return ops;
-    }
-
-    function opToSpeech(op){
-      if(lang === "ru"){
-        if(op === "+") return "плюс";
-        if(op === "-") return "минус";
-        if(op === "×") return "умножить на";
-        if(op === "÷") return "разделить на";
-      }else{
-        if(op === "+") return "plus";
-        if(op === "-") return "minus";
-        if(op === "×") return "times";
-        if(op === "÷") return "divided by";
-      }
-      return op;
-    }
-
-    function makeProblem(){
-      const ops = getEnabledOps();
-      const op = ops[Math.floor(Math.random()*ops.length)];
-
-      let a, b, ans;
-
-      if(op === "+"){
-        a = randInt(1, easyMode ? 20 : 100);
-        b = randInt(1, easyMode ? 20 : 100);
-        ans = a + b;
-      }else if(op === "-"){
-        a = randInt(1, easyMode ? 20 : 100);
-        b = randInt(1, easyMode ? 20 : 100);
-        if(b > a) [a, b] = [b, a];
-        ans = a - b;
-      }else if(op === "×"){
-        a = randInt(1, easyMode ? 10 : 20);
-        b = randInt(1, easyMode ? 10 : 20);
-        ans = a * b;
-      }else{
-        const base = randInt(1, easyMode ? 10 : 20);
-        const res = randInt(1, easyMode ? 10 : 20);
-        a = base * res;
-        b = base;
-        ans = res;
-      }
-
-      const text = `${a} ${op} ${b} = ?`;
-      return { a, b, op, text, answer: ans };
-    }
-
-    function speakProblem(p){
-      const spoken = (lang === "ru")
-        ? `${p.a} ${opToSpeech(p.op)} ${p.b}. Сколько будет?`
-        : `${p.a} ${opToSpeech(p.op)} ${p.b}. What is the answer?`;
-      speak(spoken);
-    }
-
-    // ---------------------------
-    // Игра
-    // ---------------------------
-    function newRound(){
-      current = makeProblem();
-      problemTextEl.textContent = current.text;
-      answerEl.value = "";
-      answerEl.focus();
-
-      setBuddy("🙂", lang === "ru" ? "Впиши ответ" : "Type the answer");
-      setMessage(lang === "ru" ? "Реши пример и введи ответ" : "Solve it and type the answer", "🧠");
-
-      if(voicePrimed) speakProblem(current);
-    }
-
-    function checkAnswer(){
-      primeVoiceOnce();
-      if(!current) return;
-
-      const raw = (answerEl.value || "").trim();
-      if(raw === ""){
-        setMessage(lang === "ru" ? "Введи число 🙂" : "Type a number 🙂", "✍️");
-        setBuddy("✍️", lang === "ru" ? "Нужно число" : "Need a number");
-        speak(lang === "ru" ? "Введи число" : "Type a number");
-        return;
-      }
-
-      const val = Number(raw.replace(",", "."));
-      if(!Number.isFinite(val)){
-        setMessage(lang === "ru" ? "Похоже, это не число" : "That does not look like a number", "🤔");
-        setBuddy("🤔", lang === "ru" ? "Попробуй еще" : "Try again");
-        speak(lang === "ru" ? "Это не число" : "That is not a number");
-        return;
-      }
-
-      tries++;
-      updateStats();
-
-      if(val === current.answer){
-        score++;
-        streak++;
-        updateStats();
-
-        setMessage(
-          lang === "ru" ? `Правильно! ${current.text.replace("= ?", "= " + current.answer)}`
-                        : `Correct! ${current.text.replace("= ?", "= " + current.answer)}`,
-          "🎉"
-        );
-        setBuddy("😄", lang === "ru" ? "Ура! Так держать" : "Yay! Great job");
-        speak(lang === "ru" ? "Правильно!" : "Correct!");
-        setTimeout(newRound, 750);
-      }else{
-        streak = 0;
-        updateStats();
-
-        setMessage(lang === "ru" ? "Почти! Попробуй еще 🙂" : "Almost! Try again 🙂", "💪");
-        setBuddy("🤗", lang === "ru" ? "Сделай еще попытку" : "One more try");
-        speak(lang === "ru" ? "Почти. Попробуй еще." : "Almost. Try again.");
-        answerEl.select();
-      }
-    }
-
-    function giveHint(){
-      primeVoiceOnce();
-      if(!current) return;
-
-      const hintText =
-        (lang === "ru")
-          ? (current.op === "+" ? "Сложение: считай по шагам."
-            : current.op === "-" ? "Вычитание: от большего отними меньшее."
-            : current.op === "×" ? "Умножение: это много раз сложение."
-            : "Деление: сколько раз делитель помещается в числе.")
-          : (current.op === "+" ? "Addition: count step by step."
-            : current.op === "-" ? "Subtraction: take the smaller from the bigger."
-            : current.op === "×" ? "Multiplication: repeated addition."
-            : "Division: how many times it fits.");
-
-      setMessage(hintText, "💡");
-      setBuddy("💡", lang === "ru" ? "Подумай спокойно" : "Take your time");
-      speak(hintText);
-    }
-
-    function repeatProblem(){
-      primeVoiceOnce();
-      if(!current) return;
-      setMessage(lang === "ru" ? "Повторяю пример" : "Repeating the problem", "🔁");
-      setBuddy("🙂", lang === "ru" ? "Слушай внимательно" : "Listen carefully");
-      speakProblem(current);
-      answerEl.focus();
-    }
-
-    // ---------------------------
-    // UI события
-    // ---------------------------
-    document.getElementById("checkBtn").addEventListener("click", checkAnswer);
-    document.getElementById("newBtn").addEventListener("click", () => { primeVoiceOnce(); newRound(); });
-    document.getElementById("repeatBtn").addEventListener("click", repeatProblem);
-    document.getElementById("helpBtn").addEventListener("click", giveHint);
-
-    answerEl.addEventListener("keydown", (e) => {
-      if(e.key === "Enter"){ e.preventDefault(); checkAnswer(); }
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if(e.key === "ArrowRight"){ primeVoiceOnce(); newRound(); }
-      if(e.key === "ArrowUp"){ repeatProblem(); }
-    });
-
-    easyToggleEl.addEventListener("change", () => {
-      primeVoiceOnce();
-      easyMode = easyToggleEl.checked;
-      speak(easyMode ? (lang === "ru" ? "Полегче" : "Easy mode") : (lang === "ru" ? "Обычный режим" : "Normal mode"));
-      newRound();
-    });
-
-    langEl.addEventListener("change", () => {
-      primeVoiceOnce();
-      lang = langEl.value;
-      loadVoices();
-      voicePrimed = false;
-      primeVoiceOnce();
-      newRound();
-    });
-
-    [opAddEl, opSubEl, opMulEl, opDivEl].forEach(el => {
-      el.addEventListener("change", () => { primeVoiceOnce(); newRound(); });
-    });
-
-    // Старт
-    updateStats();
-    newRound();
+  // ---------- Data: European wheel order ----------
+  const WHEEL = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+  const RED = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]); // европейская раскраска
+  function colorOf(n){
+    if(n===0) return "green";
+    return RED.has(n) ? "red" : "black";
   }
+
+  // ---------- State ----------
+  const LS_KEY="tgRoulette_v1";
+  const seedNonceKey="tgRoulette_nonce";
+  const defaultState = {
+    balance: 5000,
+    bets: [],        // {type, key, amount}
+    totalBet: 0,
+    history: [],     // {n, ts, win}
+    spinning: false,
+    sound: true,
+    gamePhase: "betting",
+    chip: 1,
+    lastBets: []
+  };
+
+  function loadState(){
+    try{
+      const s = JSON.parse(localStorage.getItem(LS_KEY)||"null");
+      if(!s) return structuredClone(defaultState);
+      return Object.assign(structuredClone(defaultState), s);
+    }catch{ return structuredClone(defaultState); }
+  }
+  function saveState(){
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+  }
+  // seed/nonce (для “общей повторяемости”, но результат все равно RNG)
+  if(!localStorage.getItem(seedNonceKey)) localStorage.setItem(seedNonceKey, String(randU32()));
+
+  const state = loadState();
+
+  // ---------- DOM ----------
+  const balanceEl = document.getElementById("balance");
+  const totalBetEl = document.getElementById("totalBet");
+  const phaseEl = document.getElementById("phase");
+  const soundBtn = document.getElementById("soundBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const layoutEl = document.getElementById("layout");
+  const outsideEl = document.getElementById("outside");
+  const undoBtn = document.getElementById("undoBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const repeatBtn = document.getElementById("repeatBtn");
+  const autoBtn = document.getElementById("autoBtn");
+  const spinBtn = document.getElementById("spinBtn");
+  const histEl = document.getElementById("hist");
+  const hcEl = document.getElementById("hc");
+  const bannerEl = document.getElementById("banner");
+  const timerFill = document.getElementById("timerFill");
+  const overlay = document.getElementById("overlay");
+  const bigTitle = document.getElementById("bigTitle");
+  const bigAmt = document.getElementById("bigAmt");
+  const contBtn = document.getElementById("contBtn");
+
+  // ---------- Wheel canvas + physics ----------
+  const canvas = document.getElementById("wheel");
+  const ctx = canvas.getContext("2d", { alpha: true });
+
+  let dpr=1, cw=0, ch=0;
+  const ro = new ResizeObserver(entries => {
+    const r = entries[0].contentRect;
+    dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    cw = Math.floor(r.width*dpr);
+    ch = Math.floor(r.height*dpr);
+    canvas.width=cw; canvas.height=ch;
+  });
+  ro.observe(canvas);
+
+  const phys = {
+    wheelA: 0,
+    wheelW: 0,
+    wheelWTarget: 0,
+    wheelWStart: 0,
+    wheelT0: 0,
+    wheelDur: 0,
+
+    ballA: 0,
+    ballW: 0,
+    ballR: 0.86,
+    ballRTarget: 0.74,
+    ballR0: 0.86,
+    ballT0: 0,
+    ballDur: 0,
+
+    winner: null,
+    winnerIndex: 0,
+    settle: 0,
+    confetti: []
+  };
+
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
+  function easeInOut(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+  function drawWheel(){
+    if(!cw||!ch) return;
+    const w=cw, h=ch;
+    const cx=w/2, cy=h/2;
+    const R=Math.min(w,h)*0.48;
+    ctx.clearRect(0,0,w,h);
+
+    // shadow
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.shadowColor="rgba(0,0,0,.65)";
+    ctx.shadowBlur=20*dpr;
+    ctx.fillStyle="rgba(0,0,0,.25)";
+    ctx.fill();
+    ctx.restore();
+
+    // outer metal ring
+    const ringG = ctx.createRadialGradient(cx,cy,R*0.2,cx,cy,R);
+    ringG.addColorStop(0,"rgba(255,255,255,.12)");
+    ringG.addColorStop(0.45,"rgba(212,175,55,.22)");
+    ringG.addColorStop(1,"rgba(0,0,0,.55)");
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.fillStyle=ringG;
+    ctx.fill();
+
+    // inner ring
+    ctx.beginPath();
+    ctx.arc(cx,cy,R*0.88,0,Math.PI*2);
+    ctx.fillStyle="rgba(0,0,0,.35)";
+    ctx.fill();
+
+    // pockets
+    const n=37;
+    const ang = (Math.PI*2)/n;
+    const start = -Math.PI/2 + phys.wheelA;
+
+    for(let i=0;i<n;i++){
+      const a0 = start + i*ang;
+      const a1 = a0 + ang;
+
+      const num = WHEEL[i];
+      const col = colorOf(num);
+      const base = col==="red" ? "rgba(217,21,32,1)" : col==="black" ? "rgba(10,10,10,1)" : "rgba(11,122,42,1)";
+
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,R*0.84,a0,a1);
+      ctx.closePath();
+      ctx.fillStyle=base;
+      ctx.fill();
+
+      // thin separator
+      ctx.strokeStyle="rgba(255,255,255,.12)";
+      ctx.lineWidth=1*dpr;
+      ctx.stroke();
+
+      // highlight winner pocket
+      if(phys.winner!==null && i===phys.winnerIndex){
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.arc(cx,cy,R*0.84,a0,a1);
+        ctx.closePath();
+        ctx.fillStyle="rgba(255,209,102,.22)";
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // number text
+      const mid=(a0+a1)/2;
+      const tr=R*0.63;
+      const tx=cx+Math.cos(mid)*tr;
+      const ty=cy+Math.sin(mid)*tr;
+      ctx.save();
+      ctx.translate(tx,ty);
+      ctx.rotate(mid+Math.PI/2);
+      ctx.fillStyle="rgba(255,255,255,.92)";
+      ctx.font = `${Math.floor(14*dpr)}px system-ui`;
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.fillText(String(num),0,0);
+      ctx.restore();
+    }
+
+    // center metal
+    const hubG = ctx.createRadialGradient(cx,cy,0,cx,cy,R*0.22);
+    hubG.addColorStop(0,"rgba(255,255,255,.18)");
+    hubG.addColorStop(0.6,"rgba(212,175,55,.35)");
+    hubG.addColorStop(1,"rgba(0,0,0,.55)");
+    ctx.beginPath();
+    ctx.arc(cx,cy,R*0.22,0,Math.PI*2);
+    ctx.fillStyle=hubG;
+    ctx.fill();
+
+    // ball track
+    ctx.beginPath();
+    ctx.arc(cx,cy,R*0.92,0,Math.PI*2);
+    ctx.strokeStyle="rgba(255,255,255,.12)";
+    ctx.lineWidth=2*dpr;
+    ctx.stroke();
+
+    // ball
+    const ba = phys.ballA;
+    const br = R*phys.ballR;
+    const bx=cx+Math.cos(ba)*br;
+    const by=cy+Math.sin(ba)*br;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(bx,by,8*dpr,0,Math.PI*2);
+    const bg = ctx.createRadialGradient(bx-3*dpr,by-3*dpr,1,bx,by,10*dpr);
+    bg.addColorStop(0,"rgba(255,255,255,.95)");
+    bg.addColorStop(1,"rgba(180,180,180,.95)");
+    ctx.fillStyle=bg;
+    ctx.shadowColor="rgba(0,0,0,.55)";
+    ctx.shadowBlur=10*dpr;
+    ctx.fill();
+    ctx.restore();
+
+    // pointer
+    ctx.save();
+    ctx.translate(cx, cy - R*0.98);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(-10*dpr, 18*dpr);
+    ctx.lineTo(10*dpr, 18*dpr);
+    ctx.closePath();
+    ctx.fillStyle="rgba(255,209,102,.95)";
+    ctx.shadowColor="rgba(0,0,0,.55)";
+    ctx.shadowBlur=12*dpr;
+    ctx.fill();
+    ctx.restore();
+
+    // confetti (simple)
+    if(phys.confetti.length){
+      for(const p of phys.confetti){
+        ctx.save();
+        ctx.globalAlpha = p.a;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.r);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.s/2, -p.s/2, p.s, p.s);
+        ctx.restore();
+      }
+    }
+  }
+
+  function stepPhysics(t){
+    // wheel spin
+    if(state.gamePhase==="spinning"){
+      const k = Math.min(1, (t - phys.wheelT0)/phys.wheelDur);
+      const e = easeOutCubic(k);
+      phys.wheelW = lerp(phys.wheelWStart, phys.wheelWTarget, e);
+      phys.wheelA += phys.wheelW * 0.016;
+
+      // ball: separate speed + radius drop (towards pockets)
+      const kb = Math.min(1, (t - phys.ballT0)/phys.ballDur);
+      const eb = easeInOut(kb);
+      phys.ballW = lerp(phys.ballW, 0.6, 0.01); // damping
+      phys.ballA -= phys.ballW * 0.020; // opposite direction
+      phys.ballR = lerp(phys.ballR0, phys.ballRTarget, eb);
+
+      // jitter near end
+      if(k>0.78 && phys.winner!==null){
+        phys.ballA += (randFloat()-0.5)*0.018;
+        phys.ballR = phys.ballRTarget + (randFloat()-0.5)*0.01;
+      }
+
+      if(k>=1){
+        state.gamePhase="result";
+        state.spinning=false;
+        onResult();
+      }
+    }
+
+    // confetti update
+    if(phys.confetti.length){
+      phys.confetti = phys.confetti.filter(p => p.a>0.02);
+      for(const p of phys.confetti){
+        p.vy += 0.12*dpr;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.r += p.vr;
+        p.a *= 0.97;
+      }
+    }
+  }
+
+  let lastT = performance.now();
+  function loop(now){
+    const t = now;
+    const dt = Math.min(32, now-lastT);
+    lastT = now;
+
+    // schedule dt inside physics via fixed-ish time
+    stepPhysics(t);
+    drawWheel();
+    requestAnimationFrame(loop);
+  }
+
+  // ---------- Betting model ----------
+  // bet types:
+  // straight: key = number (0..36) payout 35:1 (we’ll return stake + winnings => 36x stake total)
+  // color: key = red|black payout 1:1 => 2x
+  // parity: key = even|odd payout 1:1 => 2x
+  // range: key = low|high payout 1:1 => 2x (1-18,19-36)
+  // dozen: key = 1|2|3 payout 2:1 => 3x
+  // column: key = 1|2|3 payout 2:1 => 3x
+  const PAY = {
+    straight: 36,
+    color: 2,
+    parity: 2,
+    range: 2,
+    dozen: 3,
+    column: 3
+  };
+
+  function addBet(type, key, amount){
+    if(state.gamePhase!=="betting") return false;
+    if(state.balance < amount) return false;
+
+    state.balance -= amount;
+
+    // merge same bet
+    const b = state.bets.find(x => x.type===type && x.key===key);
+    if(b) b.amount += amount;
+    else state.bets.push({type, key, amount});
+
+    state.totalBet += amount;
+    saveState();
+    updateUI();
+    Sound.blip(420, 0.07, 0.08);
+    haptic("medium");
+    return true;
+  }
+
+  function undoBet(){
+    if(state.gamePhase!=="betting") return;
+    const last = state.bets.pop();
+    if(!last) return;
+    state.balance += last.amount;
+    state.totalBet = Math.max(0, state.totalBet - last.amount);
+    saveState();
+    updateUI();
+    haptic("light");
+  }
+
+  function clearBets(){
+    if(state.gamePhase!=="betting") return;
+    let refund = 0;
+    for(const b of state.bets) refund += b.amount;
+    state.balance += refund;
+    state.bets = [];
+    state.totalBet = 0;
+    saveState();
+    updateUI();
+    haptic("light");
+  }
+
+  function repeatBets(){
+    if(state.gamePhase!=="betting") return;
+    if(!state.lastBets || !state.lastBets.length) return;
+    // повторяем как есть, пока хватает баланса
+    for(const b of state.lastBets){
+      if(state.balance < b.amount) break;
+      addBet(b.type, b.key, b.amount);
+    }
+    haptic("light");
+  }
+
+  function calcWin(winN){
+    let total = 0;
+
+    for(const b of state.bets){
+      let ok = false;
+      if(b.type==="straight"){
+        ok = (Number(b.key) === winN);
+      } else if(b.type==="color"){
+        ok = (winN!==0 && colorOf(winN) === b.key);
+      } else if(b.type==="parity"){
+        ok = (winN!==0 && ((winN%2===0) ? "even" : "odd") === b.key);
+      } else if(b.type==="range"){
+        ok = (winN!==0 && (winN<=18 ? "low" : "high") === b.key);
+      } else if(b.type==="dozen"){
+        if(winN!==0){
+          const d = winN<=12 ? 1 : winN<=24 ? 2 : 3;
+          ok = (String(d) === String(b.key));
+        }
+      } else if(b.type==="column"){
+        if(winN!==0){
+          const c = (winN%3===1) ? 1 : (winN%3===2) ? 2 : 3;
+          ok = (String(c) === String(b.key));
+        }
+      }
+      if(ok){
+        total += b.amount * PAY[b.type];
+      }
+    }
+    return Math.round(total);
+  }
+
+  // ---------- Build table UI ----------
+  function mkCell(cls, label, onClick){
+    const d = document.createElement("div");
+    d.className = "cell " + cls;
+    d.textContent = label;
+    d.addEventListener("click", onClick);
+    return d;
+  }
+
+  function betSum(type, key){
+    let s=0;
+    for(const b of state.bets) if(b.type===type && b.key===key) s+=b.amount;
+    return s;
+  }
+
+  function refreshBetMarks(){
+    // clear marks
+    document.querySelectorAll(".chipMark").forEach(x=>x.remove());
+
+    // mark straight cells and outside
+    for(const b of state.bets){
+      let el = document.querySelector(`[data-bet="${b.type}:${b.key}"]`);
+      if(!el && b.type==="straight") el = document.querySelector(`[data-straight="${b.key}"]`);
+      if(el){
+        const m = document.createElement("div");
+        m.className="chipMark";
+        m.textContent = Math.round(b.amount);
+        el.appendChild(m);
+      }
+    }
+  }
+
+  function buildTable(){
+    layoutEl.innerHTML="";
+    outsideEl.innerHTML="";
+
+    // create classic grid:
+    // rows 12 -> numbers 1..36 arranged in 3 columns:
+    // row1: 3 2 1 (top) but classic table is 1 bottom, 36 top.
+    // We'll do 12 rows: row 12 (top) = 36,35,34 ... row1 (bottom)=3,2,1
+    // For touch users it doesn't matter much, but we'll keep classic: bottom row is 1-3.
+    // We'll build rows from 12 down to 1.
+    const numAt = (r, c) => (r-1)*3 + c; // r=1..12 bottom to top, c=1..3
+    // Zero
+    const zero = mkCell("zero n", "0", ()=>placeStraight(0));
+    zero.dataset.straight="0";
+    layoutEl.appendChild(zero);
+
+    // rows
+    for(let r=12; r>=1; r--){
+      for(let c=3; c>=1; c--){
+        const n = numAt(r,c);
+        const col = colorOf(n);
+        const cls = (col==="red"?"red":"black") + " n";
+        const cell = mkCell(cls, String(n), ()=>placeStraight(n));
+        cell.dataset.straight=String(n);
+        layoutEl.appendChild(cell);
+      }
+      // column bet on each row end (we place three separate buttons at the bottom area visually,
+      // but easiest here: put 2to1 buttons aligned with rows 12,6,1? Instead: put at rows r==12/8/4 to look nice.
+      // We'll do 3 column buttons at r==12,8,4 (top-ish) but click zones must exist. Simpler: add at every row with same dataset, looks repetitive.
+      // Better: add once per row but same key.
+      const colKey = ((r-1)%3)+1; // not accurate mapping. We'll do classic: 2to1 buttons are 3 buttons aligned at bottom; implement outside section instead.
+      // We'll skip here.
+      const filler = document.createElement("div");
+      filler.className="cell colBtn";
+      filler.textContent = ""; // empty spacer
+      filler.style.visibility="hidden";
+      layoutEl.appendChild(filler);
+    }
+
+    // Add 3 column buttons (2to1) as outside row
+    const out = outsideEl;
+    const mkOut = (cls, label, type, key) => {
+      const el = mkCell(cls, label, ()=>placeOutside(type,key));
+      el.dataset.bet = `${type}:${key}`;
+      return el;
+    };
+
+    // Dozens (1st12/2nd12/3rd12)
+    out.appendChild(mkOut("cell", "1st 12", "dozen", "1"));
+    out.appendChild(mkOut("cell", "2nd 12", "dozen", "2"));
+    out.appendChild(mkOut("cell", "3rd 12", "dozen", "3"));
+
+    // Columns
+    out.appendChild(mkOut("cell", "2 to 1 (col1)", "column", "1"));
+    out.appendChild(mkOut("cell", "2 to 1 (col2)", "column", "2"));
+    out.appendChild(mkOut("cell", "2 to 1 (col3)", "column", "3"));
+
+    // Outside even-money
+    out.appendChild(mkOut("cell", "1-18", "range", "low"));
+    out.appendChild(mkOut("cell", "EVEN", "parity", "even"));
+    out.appendChild(mkOut("cell rb red", "RED", "color", "red"));
+    out.appendChild(mkOut("cell rb black", "BLACK", "color", "black"));
+    out.appendChild(mkOut("cell", "ODD", "parity", "odd"));
+    out.appendChild(mkOut("cell", "19-36", "range", "high"));
+  }
+
+  function placeStraight(n){
+    if(state.gamePhase!=="betting") return;
+    Sound.unlock();
+    addBet("straight", String(n), state.chip);
+  }
+  function placeOutside(type, key){
+    if(state.gamePhase!=="betting") return;
+    Sound.unlock();
+    addBet(type, String(key), state.chip);
+  }
+
+  // ---------- Round flow ----------
+  let bettingT0 = 0;
+  const BETTING_MS = 5000;
+
+  function startBetting(){
+    state.gamePhase="betting";
+    state.spinning=false;
+    state.bets=[];
+    state.totalBet=0;
+    saveState();
+    updateUI();
+    bettingT0 = performance.now();
+  }
+
+  function startNoMoreBets(){
+    state.gamePhase="no_more_bets";
+    saveState();
+    updateUI();
+    bannerEl.textContent="NO MORE BETS";
+    bannerEl.classList.add("show");
+    setTimeout(()=>bannerEl.classList.remove("show"), 1100);
+    haptic("heavy");
+    Sound.blip(260,0.12,0.10);
+  }
+
+  function startSpin(){
+    state.gamePhase="spinning";
+    state.spinning=true;
+
+    // save last bets for repeat
+    state.lastBets = state.bets.map(b => ({...b}));
+    saveState();
+    updateUI();
+
+    // determine winner (fair RNG)
+    const winIndex = Math.floor(randFloat()*37);
+    const winN = WHEEL[winIndex];
+    phys.winner = winN;
+    phys.winnerIndex = winIndex;
+
+    // animate: wheel + ball
+    phys.wheelT0 = performance.now();
+    phys.wheelDur = 5200 + Math.floor(randFloat()*500);
+    phys.wheelWStart = 0.0;
+    phys.wheelWTarget = 0.12 + randFloat()*0.05; // rad-ish in our arbitrary units
+
+    phys.ballT0 = performance.now();
+    phys.ballDur = phys.wheelDur;
+    phys.ballR0 = 0.92;
+    phys.ballRTarget = 0.74 + (randFloat()-0.5)*0.01;
+    phys.ballR = phys.ballR0;
+    phys.ballW = 11 + randFloat()*2.5;
+    phys.ballA = -Math.PI/2 + randFloat()*Math.PI*2;
+
+    Sound.whoosh(1100);
+    haptic("medium");
+  }
+
+  function onResult(){
+    // compute win + update balance/history
+    const winN = phys.winner;
+    const totalWin = calcWin(winN);
+    state.balance += totalWin;
+
+    state.history.unshift({ n: winN, ts: Date.now(), win: totalWin });
+    if(state.history.length>15) state.history = state.history.slice(0,15);
+
+    saveState();
+    updateUI();
+
+    // confetti
+    if(totalWin>0){
+      makeConfetti(28 + Math.min(30, Math.floor(totalWin/50)));
+      Sound.win();
+      haptic("success");
+    } else {
+      haptic("heavy");
+    }
+
+    // big win overlay
+    if(totalWin>0){
+      const label = totalWin>1000 ? "JACKPOT!" : totalWin>500 ? "BIG WIN!" : "WIN!";
+      bigTitle.textContent = label;
+      countUp(totalWin);
+      overlay.classList.add("show");
+
+      if(TG){
+        // MainButton
+        try{
+          TG.MainButton.setText("Играть ещё");
+          TG.MainButton.show();
+          TG.MainButton.onClick(() => {
+            TG.MainButton.hide();
+            overlay.classList.remove("show");
+            startBetting();
+          });
+        }catch{}
+        if(totalWin>1000){
+          try{ TG.showAlert(`🎉 JACKPOT! Вы выиграли ${totalWin} монет!`); }catch{}
+        }
+      }
+    } else {
+      // auto continue
+      setTimeout(startBetting, 650);
+    }
+
+    // clear current bets after result
+    state.bets=[];
+    state.totalBet=0;
+    saveState();
+    updateUI();
+  }
+
+  function makeConfetti(count){
+    phys.confetti = [];
+    for(let i=0;i<count;i++){
+      phys.confetti.push({
+        x: (cw/2) + (randFloat()-0.5)*cw*0.25,
+        y: (ch/2) + (randFloat()-0.5)*ch*0.15,
+        vx: (randFloat()-0.5)*3*dpr,
+        vy: (-2 - randFloat()*3)*dpr,
+        vr: (randFloat()-0.5)*0.25,
+        r: randFloat()*Math.PI,
+        s: (5+randFloat()*8)*dpr,
+        a: 0.95,
+        c: randFloat()<0.5 ? "rgba(255,209,102,.95)" : "rgba(212,175,55,.95)"
+      });
+    }
+  }
+
+  function countUp(total){
+    const start = 0;
+    const t0 = performance.now();
+    const dur = 700;
+    function tick(now){
+      const k = Math.min(1, (now-t0)/dur);
+      const e = easeOutCubic(k);
+      const v = Math.round(start + (total-start)*e);
+      bigAmt.textContent = `+${v}`;
+      if(k<1) requestAnimationFrame(tick);
+      else bigAmt.textContent = `+${total}`;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // ---------- UI / stats ----------
+  function updateUI(){
+    balanceEl.textContent = Math.floor(state.balance);
+    totalBetEl.textContent = Math.floor(state.totalBet);
+    phaseEl.textContent = state.gamePhase;
+
+    Sound.setOn(!!state.sound);
+    soundBtn.textContent = state.sound ? "🔊" : "🔇";
+
+    spinBtn.disabled = !(state.gamePhase==="betting" && state.totalBet>0);
+    clearBtn.disabled = !(state.gamePhase==="betting" && state.totalBet>0);
+    undoBtn.disabled = !(state.gamePhase==="betting" && state.bets.length>0);
+    repeatBtn.disabled = !(state.gamePhase==="betting" && state.lastBets && state.lastBets.length>0);
+    autoBtn.disabled = (state.gamePhase!=="betting");
+
+    refreshBetMarks();
+    renderHistory();
+    renderHotCold();
+  }
+
+  function renderHistory(){
+    histEl.innerHTML="";
+    const list = state.history.slice(0,15);
+    for(const it of list){
+      const b = document.createElement("div");
+      b.className = "ball";
+      const c = colorOf(it.n);
+      b.style.background = c==="red" ? "var(--red)" : c==="black" ? "var(--black)" : "var(--green)";
+      b.textContent = String(it.n);
+      histEl.appendChild(b);
+    }
+  }
+
+  function renderHotCold(){
+    const list = state.history.slice(0,15);
+    const map = new Map();
+    for(const it of list) map.set(it.n, (map.get(it.n)||0)+1);
+
+    const arr = Array.from(map.entries()).sort((a,b)=>b[1]-a[1]);
+    const hot = arr.slice(0,3);
+    const cold = Array.from({length:37},(_,n)=>n)
+      .map(n=>[n, map.get(n)||0])
+      .sort((a,b)=>a[1]-b[1])
+      .slice(0,3);
+
+    const fmt = (x)=>x.map(([n,c])=>`${n}(${c})`).join(" ");
+    hcEl.textContent = `Hot: ${fmt(hot)} • Cold: ${fmt(cold)}`;
+  }
+
+  // ---------- Betting timer ----------
+  function timerLoop(){
+    if(state.gamePhase==="betting"){
+      const now = performance.now();
+      const k = Math.min(1, (now-bettingT0)/BETTING_MS);
+      timerFill.style.width = `${Math.floor((1-k)*100)}%`;
+
+      if(k>=1){
+        startNoMoreBets();
+        // короткая пауза и спин
+        setTimeout(()=>startSpin(), 650);
+      }
+    } else {
+      timerFill.style.width = "0%";
+    }
+    requestAnimationFrame(timerLoop);
+  }
+
+  // ---------- Controls ----------
+  document.querySelectorAll(".chip").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      Sound.unlock();
+      document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+      el.classList.add("active");
+      state.chip = Number(el.dataset.chip);
+      saveState();
+      updateUI();
+      haptic("light");
+      Sound.blip(680, 0.06, 0.06);
+    });
+  });
+
+  spinBtn.addEventListener("click", ()=>{
+    if(state.gamePhase!=="betting" || state.totalBet<=0) return;
+    // принудительно “закрыть ставки” раньше таймера
+    startNoMoreBets();
+    setTimeout(()=>startSpin(), 650);
+  });
+
+  clearBtn.addEventListener("click", clearBets);
+  undoBtn.addEventListener("click", undoBet);
+  repeatBtn.addEventListener("click", repeatBets);
+
+  autoBtn.addEventListener("click", async ()=>{
+    if(state.gamePhase!=="betting") return;
+    Sound.unlock();
+    const modes = ["Auto 3","Auto 5","Auto 10"];
+    const next = modes[(modes.indexOf(autoBtn.textContent)+1)%modes.length];
+    autoBtn.textContent = next;
+
+    const count = next==="Auto 3" ? 3 : next==="Auto 5" ? 5 : 10;
+    autoBtn.disabled = true;
+
+    for(let i=0;i<count;i++){
+      if(state.balance<=0) break;
+      // если нет ставки, повторим последнюю, иначе пропуск
+      if(state.totalBet===0 && state.lastBets && state.lastBets.length) repeatBets();
+      if(state.totalBet===0) break;
+
+      startNoMoreBets();
+      await new Promise(r=>setTimeout(r,650));
+      startSpin();
+      // дождемся результата
+      await new Promise(r=>{
+        const check=()=> {
+          if(state.gamePhase==="betting") r();
+          else setTimeout(check, 120);
+        };
+        check();
+      });
+      await new Promise(r=>setTimeout(r,220));
+    }
+    autoBtn.disabled = false;
+  });
+
+  soundBtn.addEventListener("click", ()=>{
+    Sound.unlock();
+    state.sound = !state.sound;
+    saveState();
+    updateUI();
+    haptic("light");
+  });
+
+  resetBtn.addEventListener("click", ()=>{
+    Sound.unlock();
+    const ok = confirm("Сбросить игру? Баланс и история будут очищены.");
+    if(!ok) return;
+    Object.assign(state, structuredClone(defaultState));
+    localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(seedNonceKey);
+    localStorage.setItem(seedNonceKey, String(randU32()));
+    saveState();
+    updateUI();
+    startBetting();
+    haptic("heavy");
+  });
+
+  contBtn.addEventListener("click", ()=>{
+    overlay.classList.remove("show");
+    if(TG){
+      try{ TG.MainButton.hide(); }catch{}
+    }
+    startBetting();
+  });
+
+  // ---------- Telegram MainButton (fallback handling) ----------
+  if(TG){
+    try{
+      TG.MainButton.hide();
+    }catch{}
+  }
+
+  // ---------- Init ----------
+  buildTable();
+  updateUI();
+  startBetting();
+  requestAnimationFrame(loop);
+  requestAnimationFrame(timerLoop);
+
 })();
 </script>
 </body>
