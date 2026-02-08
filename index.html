@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Математика для детей</title>
+
+  <style>
+    :root{
+      --ink:#101828;
+      --muted:#667085;
+      --glass: rgba(255,255,255,.78);
+      --stroke: rgba(16,24,40,.10);
+      --shadow: 0 18px 60px rgba(16,24,40,.16);
+      --r: 24px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: clamp(10px, 2.5vw, 16px);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255,90,165,.55), transparent 50%),
+        radial-gradient(circle at 86% 20%, rgba(86,207,255,.60), transparent 52%),
+        radial-gradient(circle at 70% 92%, rgba(160,255,138,.55), transparent 50%),
+        radial-gradient(circle at 22% 88%, rgba(255,220,90,.65), transparent 48%),
+        linear-gradient(135deg, #f7f8ff, #fff7fb 40%, #f6fffb);
+    }
+
+    .wrap{ width:min(980px, 100%); display:grid; gap:12px; }
+
+    .topbar{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+    }
+
+    .pill{
+      background:var(--glass);
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      padding:10px 14px;
+      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+      box-shadow: var(--shadow);
+      font-size:14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .toggle{
+      display:flex; align-items:center; gap:6px;
+      font-weight:800; color:var(--muted); user-select:none;
+      white-space:nowrap;
+    }
+
+    input[type="checkbox"]{ width:18px; height:18px; accent-color:#ff4db5; }
+
+    select{
+      border-radius:14px;
+      padding:8px 10px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.92);
+      font-weight:900;
+      color:var(--ink);
+    }
+
+    .card{
+      background:var(--glass);
+      border:1px solid var(--stroke);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: clamp(12px, 2.3vw, 18px);
+      backdrop-filter: blur(12px);
+    }
+
+    .stage{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 900px){
+      .stage{ grid-template-columns: 1fr; }
+    }
+
+    .problemBox{
+      height: clamp(220px, 42vw, 320px);
+      border-radius: var(--r);
+      border:1px solid rgba(255,255,255,.6);
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255,255,255,.95), rgba(255,255,255,.5)),
+        linear-gradient(135deg, rgba(255,90,165,.30), rgba(86,207,255,.22), rgba(160,255,138,.22));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .problem{
+      font-size: clamp(44px, 8vw, 86px);
+      font-weight: 950;
+      letter-spacing: 1px;
+      text-shadow: 0 12px 40px rgba(16,24,40,.18);
+      user-select:none;
+      padding: 0 14px;
+      text-align:center;
+      line-height:1.05;
+      word-break: break-word;
+    }
+
+    .buddy{
+      position:absolute;
+      right:12px; bottom:12px;
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.82);
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow: 0 14px 28px rgba(0,0,0,.10);
+      backdrop-filter: blur(10px);
+      user-select:none;
+      max-width: 74%;
+    }
+    .buddy .face{ font-size:24px; }
+    .buddy .text{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space:nowrap;
+    }
+
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:10px;
+      font-weight:700;
+      font-size:13px;
+    }
+
+    .controls{ display:grid; gap:12px; align-content:start; }
+
+    .msg{
+      background: rgba(255,255,255,.86);
+      border-radius:18px;
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border:1px solid var(--stroke);
+      min-height:56px;
+      box-shadow: 0 12px 24px rgba(0,0,0,.08);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+    }
+    @media (max-width: 520px){
+      .row{ grid-template-columns: 1fr; }
+    }
+
+    .answer{
+      width:100%;
+      font-size:20px;
+      font-weight:900;
+      padding:12px 14px;
+      border-radius:18px;
+      border:1px solid rgba(16,24,40,.14);
+      background: rgba(255,255,255,.92);
+      outline:none;
+    }
+    .answer:focus{
+      border-color: rgba(255,77,181,.55);
+      box-shadow: 0 0 0 4px rgba(255,77,181,.15);
+    }
+
+    .btns{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      border:0;
+      border-radius:18px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
+      color:#fff;
+      background: linear-gradient(135deg, #ff4db5, #5ac8ff, #43f089);
+      box-shadow: 0 14px 30px rgba(16,24,40,.16);
+      transition: transform .08s ease;
+      white-space:nowrap;
+    }
+    button:active{ transform: translateY(1px) scale(.99); }
+
+    button.secondary{
+      background: rgba(255,255,255,.90);
+      color:var(--ink);
+      border:1px solid var(--stroke);
+      box-shadow: 0 12px 24px rgba(16,24,40,.12);
+    }
+
+    .chips{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.74);
+    }
+    .chip{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background: rgba(17,24,39,.06);
+      border:1px solid rgba(17,24,39,.08);
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip input{ width:18px; height:18px; }
+    .small{ color:var(--muted); font-weight:800; font-size:13px; }
+
+    .errorBox{
+      display:none;
+      padding:12px 14px;
+      border-radius:18px;
+      border:1px solid rgba(239,68,68,.25);
+      background: rgba(239,68,68,.10);
+      color:#7f1d1d;
+      font-weight:800;
+      white-space:pre-wrap;
+    }
+
+    /* ===== Оверлей “Открыть в Safari” =====
+       Без JS он останется, но ссылка будет кликабельна.
+       С JS он прячется через 0.4 секунды.
+    */
+    .openSafari{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(12px);
+    }
+    .openSafariCard{
+      width: min(560px, 100%);
+      border-radius: 22px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .openSafariTitle{
+      font-weight: 950;
+      font-size: 18px;
+      margin: 0 0 8px;
+    }
+    .openSafariText{
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-weight: 750;
+      line-height: 1.35;
+      font-size: 14px;
+    }
+    .openSafariActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .openSafariLink{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px 14px;
+      border-radius:18px;
+      font-weight:900;
+      text-decoration:none;
+      color:#fff;
+      background: linear-gradient(135deg, #ff4db5, #5ac8ff, #43f089);
+      box-shadow: 0 14px 30px rgba(16,24,40,.16);
+      white-space:nowrap;
+    }
+
+    .hintSteps{
+      margin-top: 10px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .tiny{
+      margin-top: 8px;
+      color: rgba(102,112,133,.95);
+      font-weight: 750;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ОВЕРЛЕЙ -->
+  <div id="openSafari" class="openSafari">
+    <div class="openSafariCard">
+      <p class="openSafariTitle">Открой в Safari</p>
+      <p class="openSafariText">
+        Встроенные просмотрщики часто не запускают кнопки и озвучку.
+        В Safari всё работает нормально.
+      </p>
+
+      <div class="openSafariActions">
+        <!-- ВАЖНО: вставь сюда свой https:// адрес этой же страницы -->
+        <a id="openSafariLink" class="openSafariLink" href="https://example.com/INDEX.html" target="_blank" rel="noopener">
+          Открыть в Safari
+        </a>
+
+        <button id="continueBtn" type="button" class="secondary">Продолжить тут</button>
+      </div>
+
+      <div class="hintSteps">
+        Если ссылка открылась “внутри приложения”, тогда: Поделиться → Открыть в Safari.
+      </div>
+      <div class="tiny">
+        Подсказка: если здесь так и останется “Загрузка…”, значит JS в просмотрщике отключён, и играть можно только через Safari/браузер.
+      </div>
+
+      <noscript>
+        <div class="tiny" style="margin-top:10px; color:#7f1d1d;">
+          Похоже, JavaScript отключён. В этом режиме игра работать не будет.
+        </div>
+      </noscript>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="errorBox" class="errorBox"></div>
+
+    <div class="topbar">
+      <div class="pill">
+        ⭐ Очки: <strong id="score">0</strong>
+        🎯 Попытки: <strong id="tries">0</strong>
+        🔥 Серия: <strong id="streak">0</strong>
+      </div>
+
+      <div class="pill" style="gap:14px;">
+        <label class="toggle">
+          <input id="voiceToggle" type="checkbox" checked />
+          🗣️ голос
+        </label>
+
+        <label class="toggle">
+          <input id="easyToggle" type="checkbox" checked />
+          🧩 полегче
+        </label>
+
+        <label class="toggle">
+          язык
+          <select id="lang">
+            <option value="ru" selected>RU</option>
+            <option value="en">EN</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="card stage">
+      <div>
+        <div class="problemBox">
+          <div class="problem" id="problemText">Загрузка…</div>
+          <div class="buddy">
+            <div class="face" id="buddyFace">🙂</div>
+            <div class="text" id="buddyText">Впиши ответ</div>
+          </div>
+        </div>
+
+        <div class="hint">
+          <span>Enter проверить</span>
+          <span>→ новый пример, ↑ повторить</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="msg" id="message">
+          <div>Реши пример и введи ответ</div>
+          <div style="font-size:22px;">🧠</div>
+        </div>
+
+        <div class="row">
+          <input id="answer" class="answer" inputmode="numeric" autocomplete="off" placeholder="Ответ" />
+          <button id="checkBtn" type="button">Проверить</button>
+        </div>
+
+        <div class="btns">
+          <button id="newBtn" type="button">✨ Новый пример</button>
+          <button class="secondary" id="repeatBtn" type="button">🔁 Повтори</button>
+          <button class="secondary" id="helpBtn" type="button">💡 Подсказка</button>
+        </div>
+
+        <div class="chips">
+          <label class="chip"><input type="checkbox" id="opAdd" checked> +</label>
+          <label class="chip"><input type="checkbox" id="opSub" checked> -</label>
+          <label class="chip"><input type="checkbox" id="opMul" checked> ×</label>
+          <label class="chip"><input type="checkbox" id="opDiv" checked> ÷</label>
+          <div class="small">Если снять все галочки, включим все обратно.</div>
+        </div>
+
+        <div class="small">На iOS озвучка включается после первого тапа по странице.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const errorBox = document.getElementById("errorBox");
+  const openSafariOverlay = document.getElementById("openSafari");
+  const continueBtn = document.getElementById("continueBtn");
+
+  function showError(e){
+    console.error(e);
+    errorBox.style.display = "block";
+    errorBox.textContent = "Ошибка в скрипте:\n\n" + (e && e.stack ? e.stack : String(e));
+  }
+
+  // Если JS работает, дадим возможность убрать оверлей
+  continueBtn.addEventListener("click", () => {
+    openSafariOverlay.style.display = "none";
+  });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    try{ init(); }
+    catch(e){ showError(e); }
+  });
+
+  function init(){
+    // JS работает -> прячем оверлей через небольшой таймер
+    setTimeout(() => { openSafariOverlay.style.display = "none"; }, 400);
+
+    // ---------------------------
+    // Состояние
+    // ---------------------------
+    let score = 0, tries = 0, streak = 0;
+    let lang = "ru";
+    let easyMode = true;
+    let current = null;
+
+    // ---------------------------
+    // Элементы
+    // ---------------------------
+    const scoreEl = document.getElementById("score");
+    const triesEl = document.getElementById("tries");
+    const streakEl = document.getElementById("streak");
+
+    const problemTextEl = document.getElementById("problemText");
+    const messageEl = document.getElementById("message");
+    const answerEl = document.getElementById("answer");
+
+    const buddyFaceEl = document.getElementById("buddyFace");
+    const buddyTextEl = document.getElementById("buddyText");
+
+    const voiceToggleEl = document.getElementById("voiceToggle");
+    const easyToggleEl = document.getElementById("easyToggle");
+    const langEl = document.getElementById("lang");
+
+    const opAddEl = document.getElementById("opAdd");
+    const opSubEl = document.getElementById("opSub");
+    const opMulEl = document.getElementById("opMul");
+    const opDivEl = document.getElementById("opDiv");
+
+    // ---------------------------
+    // iOS-friendly SpeechSynthesis
+    // ---------------------------
+    let voicesCache = [];
+    function loadVoices(){
+      try{
+        voicesCache = ("speechSynthesis" in window) ? speechSynthesis.getVoices() : [];
+      }catch(e){
+        voicesCache = [];
+      }
+    }
+    if ("speechSynthesis" in window){
+      loadVoices();
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function pickVoice(){
+      if(!voicesCache.length) return null;
+      const wanted = (lang === "ru") ? ["ru-ru","ru"] : ["en-us","en-gb","en"];
+      for(const w of wanted){
+        const v = voicesCache.find(v => (v.lang || "").toLowerCase().startsWith(w));
+        if(v) return v;
+      }
+      return voicesCache[0];
+    }
+
+    let speakTimer = null;
+    function speak(text){
+      if(!voiceToggleEl.checked) return;
+      if(!("speechSynthesis" in window)) return;
+
+      clearTimeout(speakTimer);
+      speakTimer = setTimeout(() => {
+        try{
+          speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = (lang === "ru") ? "ru-RU" : "en-US";
+          const v = pickVoice();
+          if(v) u.voice = v;
+          u.rate = 0.95;
+          u.pitch = 1.05;
+          u.volume = 1.0;
+          speechSynthesis.speak(u);
+        }catch(e){}
+      }, 80);
+    }
+
+    let voicePrimed = false;
+    function primeVoiceOnce(){
+      if(voicePrimed) return;
+      voicePrimed = true;
+      speak(lang === "ru" ? "Поехали!" : "Let's go!");
+    }
+
+    function primeOnFirstGesture(){
+      primeVoiceOnce();
+      window.removeEventListener("touchstart", primeOnFirstGesture);
+      window.removeEventListener("pointerdown", primeOnFirstGesture);
+    }
+    window.addEventListener("touchstart", primeOnFirstGesture, { passive:true });
+    window.addEventListener("pointerdown", primeOnFirstGesture, { passive:true });
+
+    // ---------------------------
+    // Утилиты
+    // ---------------------------
+    function randInt(min, max){
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function setBuddy(face, text){
+      buddyFaceEl.textContent = face;
+      buddyTextEl.textContent = text;
+    }
+
+    function setMessage(text, emoji){
+      messageEl.innerHTML = `<div>${text}</div><div style="font-size:22px;">${emoji}</div>`;
+    }
+
+    function updateStats(){
+      scoreEl.textContent = score;
+      triesEl.textContent = tries;
+      streakEl.textContent = streak;
+    }
+
+    function getEnabledOps(){
+      const ops = [];
+      if(opAddEl.checked) ops.push("+");
+      if(opSubEl.checked) ops.push("-");
+      if(opMulEl.checked) ops.push("×");
+      if(opDivEl.checked) ops.push("÷");
+      if(ops.length === 0){
+        opAddEl.checked = opSubEl.checked = opMulEl.checked = opDivEl.checked = true;
+        return ["+","-","×","÷"];
+      }
+      return ops;
+    }
+
+    function opToSpeech(op){
+      if(lang === "ru"){
+        if(op === "+") return "плюс";
+        if(op === "-") return "минус";
+        if(op === "×") return "умножить на";
+        if(op === "÷") return "разделить на";
+      }else{
+        if(op === "+") return "plus";
+        if(op === "-") return "minus";
+        if(op === "×") return "times";
+        if(op === "÷") return "divided by";
+      }
+      return op;
+    }
+
+    function makeProblem(){
+      const ops = getEnabledOps();
+      const op = ops[Math.floor(Math.random()*ops.length)];
+
+      let a, b, ans;
+
+      if(op === "+"){
+        a = randInt(1, easyMode ? 20 : 100);
+        b = randInt(1, easyMode ? 20 : 100);
+        ans = a + b;
+      }else if(op === "-"){
+        a = randInt(1, easyMode ? 20 : 100);
+        b = randInt(1, easyMode ? 20 : 100);
+        if(b > a) [a, b] = [b, a];
+        ans = a - b;
+      }else if(op === "×"){
+        a = randInt(1, easyMode ? 10 : 20);
+        b = randInt(1, easyMode ? 10 : 20);
+        ans = a * b;
+      }else{
+        const base = randInt(1, easyMode ? 10 : 20);
+        const res = randInt(1, easyMode ? 10 : 20);
+        a = base * res;
+        b = base;
+        ans = res;
+      }
+
+      const text = `${a} ${op} ${b} = ?`;
+      return { a, b, op, text, answer: ans };
+    }
+
+    function speakProblem(p){
+      const spoken = (lang === "ru")
+        ? `${p.a} ${opToSpeech(p.op)} ${p.b}. Сколько будет?`
+        : `${p.a} ${opToSpeech(p.op)} ${p.b}. What is the answer?`;
+      speak(spoken);
+    }
+
+    // ---------------------------
+    // Игра
+    // ---------------------------
+    function newRound(){
+      current = makeProblem();
+      problemTextEl.textContent = current.text;
+      answerEl.value = "";
+      answerEl.focus();
+
+      setBuddy("🙂", lang === "ru" ? "Впиши ответ" : "Type the answer");
+      setMessage(lang === "ru" ? "Реши пример и введи ответ" : "Solve it and type the answer", "🧠");
+
+      if(voicePrimed) speakProblem(current);
+    }
+
+    function checkAnswer(){
+      primeVoiceOnce();
+      if(!current) return;
+
+      const raw = (answerEl.value || "").trim();
+      if(raw === ""){
+        setMessage(lang === "ru" ? "Введи число 🙂" : "Type a number 🙂", "✍️");
+        setBuddy("✍️", lang === "ru" ? "Нужно число" : "Need a number");
+        speak(lang === "ru" ? "Введи число" : "Type a number");
+        return;
+      }
+
+      const val = Number(raw.replace(",", "."));
+      if(!Number.isFinite(val)){
+        setMessage(lang === "ru" ? "Похоже, это не число" : "That does not look like a number", "🤔");
+        setBuddy("🤔", lang === "ru" ? "Попробуй еще" : "Try again");
+        speak(lang === "ru" ? "Это не число" : "That is not a number");
+        return;
+      }
+
+      tries++;
+      updateStats();
+
+      if(val === current.answer){
+        score++;
+        streak++;
+        updateStats();
+
+        setMessage(
+          lang === "ru" ? `Правильно! ${current.text.replace("= ?", "= " + current.answer)}`
+                        : `Correct! ${current.text.replace("= ?", "= " + current.answer)}`,
+          "🎉"
+        );
+        setBuddy("😄", lang === "ru" ? "Ура! Так держать" : "Yay! Great job");
+        speak(lang === "ru" ? "Правильно!" : "Correct!");
+        setTimeout(newRound, 750);
+      }else{
+        streak = 0;
+        updateStats();
+
+        setMessage(lang === "ru" ? "Почти! Попробуй еще 🙂" : "Almost! Try again 🙂", "💪");
+        setBuddy("🤗", lang === "ru" ? "Сделай еще попытку" : "One more try");
+        speak(lang === "ru" ? "Почти. Попробуй еще." : "Almost. Try again.");
+        answerEl.select();
+      }
+    }
+
+    function giveHint(){
+      primeVoiceOnce();
+      if(!current) return;
+
+      const hintText =
+        (lang === "ru")
+          ? (current.op === "+" ? "Сложение: считай по шагам."
+            : current.op === "-" ? "Вычитание: от большего отними меньшее."
+            : current.op === "×" ? "Умножение: это много раз сложение."
+            : "Деление: сколько раз делитель помещается в числе.")
+          : (current.op === "+" ? "Addition: count step by step."
+            : current.op === "-" ? "Subtraction: take the smaller from the bigger."
+            : current.op === "×" ? "Multiplication: repeated addition."
+            : "Division: how many times it fits.");
+
+      setMessage(hintText, "💡");
+      setBuddy("💡", lang === "ru" ? "Подумай спокойно" : "Take your time");
+      speak(hintText);
+    }
+
+    function repeatProblem(){
+      primeVoiceOnce();
+      if(!current) return;
+      setMessage(lang === "ru" ? "Повторяю пример" : "Repeating the problem", "🔁");
+      setBuddy("🙂", lang === "ru" ? "Слушай внимательно" : "Listen carefully");
+      speakProblem(current);
+      answerEl.focus();
+    }
+
+    // ---------------------------
+    // UI события
+    // ---------------------------
+    document.getElementById("checkBtn").addEventListener("click", checkAnswer);
+    document.getElementById("newBtn").addEventListener("click", () => { primeVoiceOnce(); newRound(); });
+    document.getElementById("repeatBtn").addEventListener("click", repeatProblem);
+    document.getElementById("helpBtn").addEventListener("click", giveHint);
+
+    answerEl.addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){ e.preventDefault(); checkAnswer(); }
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "ArrowRight"){ primeVoiceOnce(); newRound(); }
+      if(e.key === "ArrowUp"){ repeatProblem(); }
+    });
+
+    easyToggleEl.addEventListener("change", () => {
+      primeVoiceOnce();
+      easyMode = easyToggleEl.checked;
+      speak(easyMode ? (lang === "ru" ? "Полегче" : "Easy mode") : (lang === "ru" ? "Обычный режим" : "Normal mode"));
+      newRound();
+    });
+
+    langEl.addEventListener("change", () => {
+      primeVoiceOnce();
+      lang = langEl.value;
+      loadVoices();
+      voicePrimed = false;
+      primeVoiceOnce();
+      newRound();
+    });
+
+    [opAddEl, opSubEl, opMulEl, opDivEl].forEach(el => {
+      el.addEventListener("change", () => { primeVoiceOnce(); newRound(); });
+    });
+
+    // Старт
+    updateStats();
+    newRound();
+  }
+})();
+</script>
+</body>
+</html>
